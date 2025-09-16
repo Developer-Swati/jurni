@@ -12,6 +12,8 @@ export interface TripFormData {
   interests: string[];
   accommodationType: string;
   transportPreference: string;
+  selectedHotel?: string;
+  selectedTransport?: string;
 }
 
 export interface Activity {
