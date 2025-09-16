@@ -23,7 +23,7 @@ export default function TripPlanner() {
     adults: 1,
     children: 0,
     infants: 0,
-    pets: false,
+    pets: 0,
     budget: 0,
     currency: 'USD',
     interests: [],

@@ -6,7 +6,7 @@ export interface TripFormData {
   adults: number;
   children: number;
   infants: number;
-  pets: boolean;
+  pets: number;
   budget: number;
   currency: string;
   interests: string[];

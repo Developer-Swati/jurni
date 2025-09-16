@@ -9,6 +9,29 @@ interface TripInfoStepProps {
 }
 
 export default function TripInfoStep({ data, updateData }: TripInfoStepProps) {
+  const handleStartDateChange = (value: string) => {
+    const newStartDate = new Date(value);
+    const updates: Partial<TripFormData> = { startDate: newStartDate };
+    
+    // If end date is before the new start date, update it to match start date
+    if (data.endDate && data.endDate < newStartDate) {
+      updates.endDate = newStartDate;
+    }
+    
+    updateData(updates);
+  };
+
+  const getMinEndDate = () => {
+    if (data.startDate) {
+      return data.startDate.toISOString().split('T')[0];
+    }
+    return new Date().toISOString().split('T')[0];
+  };
+
+  const getMinStartDate = () => {
+    return new Date().toISOString().split('T')[0];
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6" data-testid="text-trip-info-title">Trip Information</h2>
@@ -18,7 +41,7 @@ export default function TripInfoStep({ data, updateData }: TripInfoStepProps) {
           <div className="relative">
             <Input
               id="departureCity"
-              placeholder="Enter departure city"
+              placeholder="Where are you traveling from?"
               value={data.departureCity}
               onChange={(e) => updateData({ departureCity: e.target.value })}
               className="pr-10"
@@ -46,8 +69,9 @@ export default function TripInfoStep({ data, updateData }: TripInfoStepProps) {
           <Input
             id="startDate"
             type="date"
+            min={getMinStartDate()}
             value={data.startDate ? data.startDate.toISOString().split('T')[0] : ''}
-            onChange={(e) => updateData({ startDate: new Date(e.target.value) })}
+            onChange={(e) => handleStartDateChange(e.target.value)}
             data-testid="input-start-date"
           />
         </div>
@@ -56,9 +80,11 @@ export default function TripInfoStep({ data, updateData }: TripInfoStepProps) {
           <Input
             id="endDate"
             type="date"
+            min={getMinEndDate()}
             value={data.endDate ? data.endDate.toISOString().split('T')[0] : ''}
             onChange={(e) => updateData({ endDate: new Date(e.target.value) })}
             data-testid="input-end-date"
+            placeholder="Pick end date"
           />
         </div>
       </div>

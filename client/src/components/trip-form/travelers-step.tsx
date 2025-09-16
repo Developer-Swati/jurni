@@ -1,7 +1,7 @@
 import { TripFormData } from "@/types/trip";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import { Users, Baby, Dog, Minus, Plus } from "lucide-react";
 
 interface TravelersStepProps {
   data: TripFormData;
@@ -9,70 +9,125 @@ interface TravelersStepProps {
 }
 
 export default function TravelersStep({ data, updateData }: TravelersStepProps) {
+  const incrementValue = (field: keyof TripFormData, currentValue: number, max: number = 20) => {
+    if (currentValue < max) {
+      updateData({ [field]: currentValue + 1 });
+    }
+  };
+
+  const decrementValue = (field: keyof TripFormData, currentValue: number, min: number = 0) => {
+    if (currentValue > min) {
+      updateData({ [field]: currentValue - 1 });
+    }
+  };
+
+  const incrementPets = () => {
+    updateData({ pets: data.pets + 1 });
+  };
+
+  const decrementPets = () => {
+    if (data.pets > 0) {
+      updateData({ pets: data.pets - 1 });
+    }
+  };
+
+  const TravelerControl = ({ 
+    icon: Icon, 
+    title, 
+    subtitle, 
+    value, 
+    onIncrement, 
+    onDecrement, 
+    min = 0,
+    testIdPrefix 
+  }: {
+    icon: React.ComponentType<any>;
+    title: string;
+    subtitle: string;
+    value: number;
+    onIncrement: () => void;
+    onDecrement: () => void;
+    min?: number;
+    testIdPrefix: string;
+  }) => (
+    <div className="flex items-center justify-between py-4 border-b border-border last:border-b-0">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-blue-50 rounded-full">
+          <Icon className="h-5 w-5 text-blue-600" />
+        </div>
+        <div>
+          <h3 className="font-medium text-foreground">{title}</h3>
+          <p className="text-sm text-muted-foreground">{subtitle}</p>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onDecrement}
+          disabled={value <= min}
+          className="h-10 w-10 rounded-lg"
+          data-testid={`button-${testIdPrefix}-decrement`}
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+        <span className="text-lg font-medium w-8 text-center" data-testid={`text-${testIdPrefix}-value`}>
+          {value}
+        </span>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onIncrement}
+          className="h-10 w-10 rounded-lg"
+          data-testid={`button-${testIdPrefix}-increment`}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6" data-testid="text-travelers-title">Travelers</h2>
-      <div className="space-y-6">
-        <div className="grid md:grid-cols-3 gap-6">
-          <div>
-            <Label>Adults</Label>
-            <Select value={data.adults.toString()} onValueChange={(value) => updateData({ adults: parseInt(value) })}>
-              <SelectTrigger data-testid="select-adults">
-                <SelectValue placeholder="Select adults" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1 Adult</SelectItem>
-                <SelectItem value="2">2 Adults</SelectItem>
-                <SelectItem value="3">3 Adults</SelectItem>
-                <SelectItem value="4">4+ Adults</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Children</Label>
-            <Select value={data.children.toString()} onValueChange={(value) => updateData({ children: parseInt(value) })}>
-              <SelectTrigger data-testid="select-children">
-                <SelectValue placeholder="Select children" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">0 Children</SelectItem>
-                <SelectItem value="1">1 Child</SelectItem>
-                <SelectItem value="2">2 Children</SelectItem>
-                <SelectItem value="3">3+ Children</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Infants</Label>
-            <Select value={data.infants.toString()} onValueChange={(value) => updateData({ infants: parseInt(value) })}>
-              <SelectTrigger data-testid="select-infants">
-                <SelectValue placeholder="Select infants" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">0 Infants</SelectItem>
-                <SelectItem value="1">1 Infant</SelectItem>
-                <SelectItem value="2">2 Infants</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div>
-          <Label>Traveling with pets?</Label>
-          <RadioGroup
-            value={data.pets ? "yes" : "no"}
-            onValueChange={(value) => updateData({ pets: value === "yes" })}
-            className="flex items-center space-x-4 mt-2"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="yes" id="pets-yes" data-testid="radio-pets-yes" />
-              <Label htmlFor="pets-yes">Yes</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="no" id="pets-no" data-testid="radio-pets-no" />
-              <Label htmlFor="pets-no">No</Label>
-            </div>
-          </RadioGroup>
-        </div>
+      <div className="bg-card border border-border rounded-lg p-6">
+        <TravelerControl
+          icon={Users}
+          title="Adults"
+          subtitle="Age 18+"
+          value={data.adults}
+          onIncrement={() => incrementValue('adults', data.adults)}
+          onDecrement={() => decrementValue('adults', data.adults, 1)}
+          min={1}
+          testIdPrefix="adults"
+        />
+        <TravelerControl
+          icon={Baby}
+          title="Children"
+          subtitle="Age 2-17"
+          value={data.children}
+          onIncrement={() => incrementValue('children', data.children)}
+          onDecrement={() => decrementValue('children', data.children)}
+          testIdPrefix="children"
+        />
+        <TravelerControl
+          icon={Baby}
+          title="Infants"
+          subtitle="Under 2"
+          value={data.infants}
+          onIncrement={() => incrementValue('infants', data.infants)}
+          onDecrement={() => decrementValue('infants', data.infants)}
+          testIdPrefix="infants"
+        />
+        <TravelerControl
+          icon={Dog}
+          title="Pets"
+          subtitle="Service animals"
+          value={data.pets}
+          onIncrement={incrementPets}
+          onDecrement={decrementPets}
+          testIdPrefix="pets"
+        />
       </div>
     </div>
   );
